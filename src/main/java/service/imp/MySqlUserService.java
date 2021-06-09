@@ -9,6 +9,7 @@ import service.UserService;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 public class MySqlUserService implements UserService {
 
@@ -35,8 +36,15 @@ public class MySqlUserService implements UserService {
     }
 
     @Override
-    //TODO: implement
-    public Blog getBlogById(int id) throws SQLException, NoSuchBlogException {
+    //TODO: Implement
+    public List<User> getAllUsers() throws SQLException {
+
+        return null;
+    }
+
+    @Override
+    //TODO: Implement
+    public User getUserById(int id) throws SQLException, NoSuchBlogException {
         return null;
     }
 }
