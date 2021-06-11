@@ -1,14 +1,14 @@
 package service.imp;
 
 import exception.NoSuchBlogException;
+import exception.NoSuchUserException;
 import model.Blog;
 import model.User;
 import jdbc.MySqlConnector;
 import service.UserService;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MySqlUserService implements UserService {
@@ -38,13 +38,29 @@ public class MySqlUserService implements UserService {
     @Override
     //TODO: Implement
     public List<User> getAllUsers() throws SQLException {
-
-        return null;
+        List<User> users = new ArrayList<>();
+        ResultSet result = null;
+        try(PreparedStatement statement = connection.prepareStatement("SELECT * FROM web.users")){
+            while (result.next()){
+                users.add(new User(result.getInt("id"), result.getString("first_name"), result.getString("last_name"), result.getInt("age")));
+            }
+        }
+        return users;
     }
 
     @Override
     //TODO: Implement
-    public User getUserById(int id) throws SQLException, NoSuchBlogException {
-        return null;
+    public User getUserById(int id) throws SQLException, NoSuchUserException {
+        ResultSet result = null;
+        try(PreparedStatement statement = connection.prepareStatement("SELECT * FROM web.users WHERE id = ?")){
+            statement.setInt(1, id);
+            result = statement.executeQuery();
+            if (result.next()) {
+                return new User(result.getInt("id"), result.getString("first_name"), result.getString("last_name"), result.getInt("age"));
+            }else throw new NoSuchUserException("No user with id: " + id);
+        }finally {
+            result.close();
+        }
     }
+
 }

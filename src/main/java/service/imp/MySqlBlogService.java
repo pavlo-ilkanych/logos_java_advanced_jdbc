@@ -1,6 +1,7 @@
 package service.imp;
 
 import exception.DuplicateBlogException;
+import exception.DuplicateUserException;
 import exception.NoSuchBlogException;
 import jdbc.MySqlConnector;
 import model.Blog;
@@ -51,13 +52,17 @@ public class MySqlBlogService implements BlogService {
     }
 
     @Override
-    public void createBlog(Blog blog) throws SQLException, DuplicateBlogException {
-        if (isExists(blog.getId())) {
+    public void createBlog(Blog blog) throws SQLException, DuplicateBlogException, DuplicateUserException {
+        if (isExistsByGetId(blog.getId())) {
             throw new DuplicateBlogException("Blog with id : " + blog.getId() + " already exists!");
         }
-
         //TODO:
         //Зробити перевірку чи є юзер з ідентифікатором blog.getUserId()
+
+        if (isExistByGetUserId(blog.getUserId())){
+            throw new DuplicateUserException("User with id: " + blog.getUserId() + " already exists!");
+        }
+
         System.out.println("Creating blog with id : " + blog.getId());
         try (PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO web.blogs (id, name, user_id) VALUES (?, ?, ?)")) {
@@ -69,10 +74,18 @@ public class MySqlBlogService implements BlogService {
     }
 
 
-    private boolean isExists(int blogId) throws SQLException {
+    private boolean isExistsByGetId(int blogId) throws SQLException {
         boolean flag = false;
         for (Blog blog : getAll()) {
             flag = blog.getId() == blogId;
+        }
+        return flag;
+    }
+
+    private boolean isExistByGetUserId(int blogUserId) throws SQLException{
+        boolean flag = false;
+        for (Blog blog : getAll()){
+            flag = blog.getUserId() == blogUserId;
         }
         return flag;
     }
